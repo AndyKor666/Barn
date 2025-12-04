@@ -23,7 +23,11 @@
   <ItemGroup>
     <Compile Include="main.py" />
     <Compile Include="Controller\controller.py" />
+    <Compile Include="Model\carrot.py" />
+    <Compile Include="Model\corn.py" />
     <Compile Include="Model\model.py" />
+    <Compile Include="Model\plant.py" />
+    <Compile Include="Model\wheat.py" />
     <Compile Include="View\view.py" />
   </ItemGroup>
   <ItemGroup>

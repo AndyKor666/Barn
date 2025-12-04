@@ -3,21 +3,24 @@ from View.view import GameView, ShopWindow, BarnWindow
 
 class GameController:
     def __init__(self, root):
-        self.model=GameModel()
-        self.view=GameView(root)
-        self.shop_window=None
-        self.barn_window=None
+        self.model = GameModel()
+        self.view = GameView(root)
+
+        self.shop_window = None
+        self.barn_window = None
+
         self.model.load_game()
         self.refresh_all()
         self.autosave()
-
         for i, btn in enumerate(self.view.plot_buttons):
             btn.config(command=lambda idx=i: self.on_plot_button(idx))
+
         self.view.open_shop_button.config(command=self.open_shop)
         self.view.open_barn_button.config(command=self.open_barn)
+
         self.view.set_plant_options([p.name for p in self.model.plants])
         self.view.set_fert_options([f.name for f in self.model.fertilizers])
-        self.refresh_all()
+
         self.schedule_tick()
 
     def autosave(self):
@@ -29,6 +32,7 @@ class GameController:
         if just_ready:
             names = ", ".join(f"{pl.plant.name} on plot {pl.id}" for pl in just_ready)
             self.set_message(f"Ready to harvest: {names}")
+
         self.refresh_plots()
         self.view.root.after(1000, self.schedule_tick)
 
@@ -37,39 +41,41 @@ class GameController:
         self.refresh_plots()
         self.refresh_fertilizer_inventory()
         self.refresh_barn_summary()
-        if self.shop_window is not None and self.shop_window.winfo_exists():
+
+        if self.shop_window and self.shop_window.winfo_exists():
             self.shop_window.refresh()
 
     def refresh_plots(self):
         for i, plot in enumerate(self.model.plots):
-            img_name = None
+
             if plot.state == "empty":
                 text = "Empty"
                 img_name = "empty.png"
                 self.view.plot_buttons[i].config(text="Plant", state="normal")
+
             elif plot.state == "growing":
-                if plot.plant is None:
-                    plot.state = "empty"
-                    plot.remaining_time = 0
-                    text = "Empty"
-                    img_name = "empty.png"
-                    self.view.plot_buttons[i].config(text="Plant", state="normal")
-                else:
-                    plant_name = plot.plant.name
-                    remaining = max(0, plot.remaining_time)
-                    text = f"Growing {plant_name} ({remaining}s)"
-                    self.view.plot_buttons[i].config(text="Growing...", state="disabled")
-                    stage = plot.plant.stage_count - max(1, int(remaining/(plot.plant.base_grow_time/plot.plant.stage_count)))
-                    img_name = f"{plot.plant.image_prefix}_{stage}.png"
+                plant = plot.plant
+                remaining = max(0, plot.remaining_time)
+
+                text = f"Growing {plant.name} ({remaining}s)"
+                self.view.plot_buttons[i].config(text="Growing...", state="disabled")
+                total = plant.base_grow_time
+                stages = plant.stages
+                elapsed = total - remaining
+                stage = max(1, min(stages, int(elapsed / (total / stages)) + 1))
+
+                img_name = f"{plant.asset_prefix}_{stage}.png"
+
             elif plot.state == "ready":
-                plant_name = plot.plant.name if plot.plant else "Unknown"
-                text = f"Ready: {plant_name}"
-                img_name = f"{plot.plant.image_prefix}_ready.png"
+                plant = plot.plant
+                text = f"Ready: {plant.name}"
+                img_name = f"{plant.asset_prefix}_{plant.stages}.png"
                 self.view.plot_buttons[i].config(text="Harvest", state="normal")
 
             else:
                 text = "Unknown"
                 img_name = "empty.png"
+
             self.view.update_plot(i, text, img_name)
 
     def refresh_fertilizer_inventory(self):
@@ -81,11 +87,10 @@ class GameController:
 
     def refresh_barn_summary(self):
         if not self.model.barn:
-            text = "(empty)"
+            txt = "(empty)"
         else:
-            parts = [f"{k} x{v}" for k, v in sorted(self.model.barn.items())]
-            text = ", ".join(parts)
-        self.view.set_barn_summary(text)
+            txt = ", ".join(f"{k} x{v}" for k, v in sorted(self.model.barn.items()))
+        self.view.set_barn_summary(txt)
 
     def on_plot_button(self, index):
         plot = self.model.plots[index]
@@ -97,8 +102,9 @@ class GameController:
     def handle_plant(self, index):
         plant_name = self.view.plant_combo.get()
         plant = next((p for p in self.model.plants if p.name == plant_name), None)
+
         if plant is None:
-            self.set_message("Select a plant first")
+            self.set_message("Select a plant")
             return
 
         fert_name = self.view.fert_combo.get()
@@ -117,19 +123,18 @@ class GameController:
         self.set_message(msg)
         self.refresh_all()
 
-    def set_message(self, msg):
-        self.view.set_message(msg)
-
     def open_shop(self):
-        if self.shop_window is not None and self.shop_window.winfo_exists():
+        if self.shop_window and self.shop_window.winfo_exists():
             self.shop_window.lift()
             return
+
         self.shop_window = ShopWindow(self.view.root, self.model, self)
 
     def open_barn(self):
-        if self.barn_window is not None and self.barn_window.winfo_exists():
+        if self.barn_window and self.barn_window.winfo_exists():
             self.barn_window.lift()
             return
+
         self.barn_window = BarnWindow(self.view.root, self.model, self)
 
     def shop_buy_fert(self, fert_id):
@@ -141,3 +146,6 @@ class GameController:
         ok, msg = self.model.sell_from_barn(plant_name)
         self.set_message(msg)
         self.refresh_all()
+
+    def set_message(self, msg):
+        self.view.set_message(msg)

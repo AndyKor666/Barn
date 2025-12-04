@@ -1,4 +1,8 @@
 import os
+from Model.wheat import Wheat
+from Model.carrot import Carrot
+from Model.corn import Corn
+
 SAVE_FILE = "save.txt"
 
 class Plant:
@@ -27,34 +31,17 @@ class FarmPlot:
 
 class GameModel:
     def __init__(self):
-        self.plants = [
-            Plant(1, "Wheat",  base_grow_time=8, sell_price=12,
-                  stage_count=4, image_prefix="wheat"),
-            Plant(2, "Carrot", base_grow_time=6, sell_price=8,
-                  stage_count=4, image_prefix="carrot"),
-            Plant(3, "Corn",   base_grow_time=12, sell_price=20,
-                  stage_count=4, image_prefix="corn"),
-        ]
-        self.fertilizers = [
-            Fertilizer(1, "Basic Fertilizer",  price=10, multiplier=0.8),
-            Fertilizer(2, "Super Fertilizer",  price=20, multiplier=0.5),
-        ]
         self.balance = 50
+        self.plants = [Corn(), Carrot(), Wheat()]
+        self.fertilizers = [
+            Fertilizer(1, "Basic Fertilizer", 10, 0.80),
+            Fertilizer(2, "Super Fertilizer", 20, 0.50),
+        ]
+
         self.fertilizer_inventory = {f.id: 0 for f in self.fertilizers}
+
         self.barn = {}
         self.plots = [FarmPlot(i) for i in range(1, 4)]
-
-    def get_plant_by_id(self, pid):
-        for p in self.plants:
-            if p.id == pid:
-                return p
-        return None
-
-    def get_fertilizer_by_id(self, fid):
-        for f in self.fertilizers:
-            if f.id == fid:
-                return f
-        return None
 
 #----------------------------------------------------------------------------
 
@@ -130,6 +117,18 @@ class GameModel:
                 self.plots[i].remaining_time = remaining
 
 #----------------------------------------------------------------------------
+
+    def get_plant_by_id(self, pid):
+        for p in self.plants:
+            if p.id == pid:
+                return p
+        return None
+
+    def get_fertilizer_by_id(self, fid):
+        for f in self.fertilizers:
+            if f.id == fid:
+                return f
+        return None
 
     def buy_fertilizer(self, fid):
         fert = self.get_fertilizer_by_id(fid)
