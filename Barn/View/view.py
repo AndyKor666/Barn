@@ -12,11 +12,11 @@ class GameView:
         self.root.geometry("900x550")
         self.root.configure(bg="#f4f4f4")
 
-        self._plot_images = [None, None, None]
+        self._plot_images=[None, None, None]
         top_frame = tk.Frame(root, bg="#f4f4f4")
         top_frame.pack(fill="x", pady=10)
 
-        self.balance_label = tk.Label(
+        self.balance_label=tk.Label(
             top_frame, text="Balance: $0", font=("Consolas", 14, "bold"),
             bg="#f4f4f4"
         )
