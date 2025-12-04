@@ -1,14 +1,12 @@
-from Model.model import GameModel
+from Models.model import GameModel
 from View.view import GameView, ShopWindow, BarnWindow
 
 class GameController:
     def __init__(self, root):
         self.model = GameModel()
         self.view = GameView(root)
-
         self.shop_window = None
         self.barn_window = None
-
         self.model.load_game()
         self.refresh_all()
         self.autosave()

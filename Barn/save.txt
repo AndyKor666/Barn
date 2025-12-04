@@ -1,6 +1,6 @@
-balance=408
-barn=Corn:3
-fertilizers=1:0,2:0
+balance=498
+barn=
+fertilizers=1:1,2:1
 plot0->empty
 plot1->empty
 plot2->empty

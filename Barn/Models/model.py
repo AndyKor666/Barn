@@ -1,7 +1,7 @@
 import os
-from Model.wheat import Wheat
-from Model.carrot import Carrot
-from Model.corn import Corn
+from Models.wheat import Wheat
+from Models.carrot import Carrot
+from Models.corn import Corn
 
 SAVE_FILE = "save.txt"
 
