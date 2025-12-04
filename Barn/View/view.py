@@ -200,7 +200,6 @@ class ShopWindow(tk.Toplevel):
             command=self._on_sell
         )
         self.sell_button.pack(pady=5)
-
         self.refresh()
 
     def refresh(self):
@@ -212,12 +211,25 @@ class ShopWindow(tk.Toplevel):
     def _on_sell(self):
         selection = self.barn_listbox.curselection()
         if not selection:
-            self.controller.set_message("Select crop in shop to sell")
+            self.controller.set_message("Select a crop to sell.")
             return
         text = self.barn_listbox.get(selection[0])
-        plant_name = text.split(" x")[0]
-        self.controller.shop_sell_crop(plant_name)
+        name, count = text.split(" x")
+        name = name.strip()
+        count = int(count)
+        total_money = 0
+        for _ in range(count):
+            ok, msg = self.model.sell_from_barn(name)
+            if ok:
+                money = int(msg.split("for $")[1])
+                total_money += money
+        if total_money == 0:
+            self.controller.set_message("Nothing sold.")
+        else:
+            self.controller.set_message(f"Sold {count}x {name} for ${total_money}")
+
         self.refresh()
+        self.controller.refresh_all()
 
 class BarnWindow(tk.Toplevel):
     def __init__(self, root, model, controller):

@@ -9,12 +9,14 @@ class Plant:
         self.sell_price=sell_price
         self.stage_count=stage_count
         self.image_prefix=image_prefix
+
 class Fertilizer:
     def __init__(self, fid, name, price, multiplier):
         self.id = fid
         self.name = name
         self.price = price
         self.multiplier = multiplier
+
 class FarmPlot:
     def __init__(self, pid):
         self.id = pid
@@ -22,6 +24,7 @@ class FarmPlot:
         self.plant = None
         self.remaining_time = 0
         self.total_time = 0
+
 class GameModel:
     def __init__(self):
         self.plants = [
@@ -53,6 +56,8 @@ class GameModel:
                 return f
         return None
 
+#----------------------------------------------------------------------------
+
     def save_game(self):
         lines=[]
         lines.append(f"balance={self.balance}")
@@ -62,13 +67,69 @@ class GameModel:
         lines.append(f"fertilizers={fert_str}")
         for i, p in enumerate(self.plots):
             if p.state == "empty":
-                lines.append(f"plot{i}=empty")
+                lines.append(f"plot{i}->empty")
             elif p.state == "growing":
-                lines.append(f"plot{i}=growing, plant={p.plant.id}, remaining={p.remaining_time}")
+                lines.append(f"plot{i}->growing, plant->{p.plant.id}, remaining->{p.remaining_time}")
             elif p.state == "ready":
-                lines.append(f"plot{i}=ready, plant={p.plant.id}")
+                lines.append(f"plot{i}->ready, plant->{p.plant.id}")
         with open(SAVE_FILE, "w") as f:
             f.write("\n".join(lines))
+
+    def load_game(self):
+        if not os.path.exists(SAVE_FILE):
+            return
+        try:
+            with open(SAVE_FILE, "r") as f:
+                lines = f.read().splitlines()
+        except:
+            return
+
+        data={}
+        for line in lines:
+            if "=" in line:
+                key, value = line.split("=", 1)
+                data[key] = value
+        self.balance = int(data.get("balance", 0))
+        barn_raw = data.get("barn", "")
+        self.barn = {}
+        if barn_raw:
+            for item in barn_raw.split(","):
+                if ":" in item:
+                    name, count = item.split(":")
+                    self.barn[name] = int(count)
+        fert_raw = data.get("fertilizers", "")
+        self.fertilizer_inventory = {}
+        if fert_raw:
+            for item in fert_raw.split(","):
+                if ":" in item:
+                    fid, count = item.split(":")
+                    self.fertilizer_inventory[int(fid)] = int(count)
+        for i in range(len(self.plots)):
+            key=f"plot{i}"
+            if key not in data:
+                continue
+            val=data[key]
+            if val == "empty":
+                self.plots[i].state = "empty"
+                self.plots[i].plant = None
+                self.plots[i].remaining_time = 0
+            else:
+                parts = val.split(",")
+                state = parts[0]
+                self.plots[i].state = state
+                plant_id = None
+                remaining = 0
+                for p in parts[1:]:
+                    if p.startswith("plant="):
+                        plant_id = int(p.split("=")[1])
+                    elif p.startswith("remaining="):
+                        remaining = int(p.split("=")[1])
+                if plant_id is not None:
+                    plant = next(pl for pl in self.plants if pl.id == plant_id)
+                    self.plots[i].plant = plant
+                self.plots[i].remaining_time = remaining
+
+#----------------------------------------------------------------------------
 
     def buy_fertilizer(self, fid):
         fert = self.get_fertilizer_by_id(fid)

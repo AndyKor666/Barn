@@ -3,19 +3,27 @@ from View.view import GameView, ShopWindow, BarnWindow
 
 class GameController:
     def __init__(self, root):
-        self.model = GameModel()
-        self.view = GameView(root)
-        self.shop_window = None
-        self.barn_window = None
+        self.model=GameModel()
+        self.view=GameView(root)
+        self.shop_window=None
+        self.barn_window=None
+        self.model.load_game()
+        self.refresh_all()
+        self.autosave()
 
         for i, btn in enumerate(self.view.plot_buttons):
             btn.config(command=lambda idx=i: self.on_plot_button(idx))
+
         self.view.open_shop_button.config(command=self.open_shop)
         self.view.open_barn_button.config(command=self.open_barn)
         self.view.set_plant_options([p.name for p in self.model.plants])
         self.view.set_fert_options([f.name for f in self.model.fertilizers])
         self.refresh_all()
         self.schedule_tick()
+
+    def autosave(self):
+        self.model.save_game()
+        self.view.root.after(3000, self.autosave)
 
     def schedule_tick(self):
         just_ready = self.model.tick()
@@ -38,18 +46,28 @@ class GameController:
             img_name = None
             if plot.state == "empty":
                 text = "Empty"
-                self.view.plot_buttons[i].config(text="Plant", state="normal")
                 img_name = "empty.png"
+                self.view.plot_buttons[i].config(text="Plant", state="normal")
             elif plot.state == "growing":
-                text = f"Growing {plot.plant.name} ({plot.remaining_time}s)"
-                self.view.plot_buttons[i].config(text="Growing...", state="disabled")
-                stage = self.model.get_plot_stage_index(plot)
-                img_name = f"{plot.plant.image_prefix}_{stage}.png"
+                if plot.plant is None:
+                    plot.state = "empty"
+                    plot.remaining_time = 0
+                    text = "Empty"
+                    img_name = "empty.png"
+                    self.view.plot_buttons[i].config(text="Plant", state="normal")
+                else:
+                    plant_name = plot.plant.name
+                    remaining = max(0, plot.remaining_time)
+                    text = f"Growing {plant_name} ({remaining}s)"
+                    self.view.plot_buttons[i].config(text="Growing...", state="disabled")
+                    stage = plot.plant.stage_count - max(1, int(remaining/(plot.plant.base_grow_time/plot.plant.stage_count)))
+                    img_name = f"{plot.plant.image_prefix}_{stage}.png"
             elif plot.state == "ready":
-                text = f"Ready: {plot.plant.name}"
+                plant_name = plot.plant.name if plot.plant else "Unknown"
+                text = f"Ready: {plant_name}"
+                img_name = f"{plot.plant.image_prefix}_ready.png"
                 self.view.plot_buttons[i].config(text="Harvest", state="normal")
-                stage = plot.plant.stage_count
-                img_name = f"{plot.plant.image_prefix}_{stage}.png"
+
             else:
                 text = "Unknown"
                 img_name = "empty.png"
