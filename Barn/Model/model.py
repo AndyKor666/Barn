@@ -60,18 +60,18 @@ class GameModel:
 
     def save_game(self):
         lines=[]
-        lines.append(f"balance={self.balance}")
+        lines.append(f"balance is {self.balance}$")
         barn_str=",".join([f"{name}:{count}" for name, count in self.barn.items()])
-        lines.append(f"barn={barn_str}")
+        lines.append(f"barn has {barn_str}")
         fert_str=",".join([f"{fid}:{count}" for fid, count in self.fertilizer_inventory.items()])
         lines.append(f"fertilizers={fert_str}")
         for i, p in enumerate(self.plots):
             if p.state == "empty":
-                lines.append(f"plot{i}->empty")
+                lines.append(f"plot{i} -> empty")
             elif p.state == "growing":
-                lines.append(f"plot{i}->growing, plant->{p.plant.id}, remaining->{p.remaining_time}")
+                lines.append(f"plot{i} -> growing, plant -> {p.plant.id}, remaining -> {p.remaining_time}")
             elif p.state == "ready":
-                lines.append(f"plot{i}->ready, plant->{p.plant.id}")
+                lines.append(f"plot{i} -> ready, plant -> {p.plant.id}")
         with open(SAVE_FILE, "w") as f:
             f.write("\n".join(lines))
 
