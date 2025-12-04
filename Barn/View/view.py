@@ -213,23 +213,28 @@ class ShopWindow(tk.Toplevel):
         if not selection:
             self.controller.set_message("Select a crop to sell.")
             return
-        text = self.barn_listbox.get(selection[0])
-        name, count = text.split(" x")
-        name = name.strip()
-        count = int(count)
-        total_money = 0
-        for _ in range(count):
-            ok, msg = self.model.sell_from_barn(name)
-            if ok:
-                money = int(msg.split("for $")[1])
-                total_money += money
-        if total_money == 0:
-            self.controller.set_message("Nothing sold.")
-        else:
-            self.controller.set_message(f"Sold {count}x {name} for ${total_money}")
 
-        self.refresh()
+        line = self.barn_listbox.get(selection[0])
+        name, count = line.split(" x")
+        count = int(count)
+
+        plant = next((p for p in self.model.plants if p.name == name), None)
+        if plant is None:
+            self.controller.set_message("Error: unknown crop.")
+            return
+
+        total_money = plant.sell_price * count
+
+        self.model.balance += total_money
+        self.model.barn[name] -= count
+
+        if self.model.barn[name] <= 0:
+            del self.model.barn[name]
+
+        self.controller.set_message(f"Sold {count}x {name} for ${total_money}")
         self.controller.refresh_all()
+        self.refresh()
+
 
 class BarnWindow(tk.Toplevel):
     def __init__(self, root, model, controller):
