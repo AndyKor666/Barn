@@ -13,7 +13,6 @@ class GameController:
 
         for i, btn in enumerate(self.view.plot_buttons):
             btn.config(command=lambda idx=i: self.on_plot_button(idx))
-
         self.view.open_shop_button.config(command=self.open_shop)
         self.view.open_barn_button.config(command=self.open_barn)
         self.view.set_plant_options([p.name for p in self.model.plants])

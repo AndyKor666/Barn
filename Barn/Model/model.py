@@ -212,10 +212,8 @@ class GameModel:
                 break
         if plant_info is None:
             return False, "Unknown crop"
-
         if self.barn.get(plant_name, 0) <= 0:
             return False, "No such crop in barn"
-
         self.barn[plant_name] -= 1
         self.balance += plant_info.sell_price
         return True, f"Sold 1 {plant_name} for {plant_info.sell_price}$"
