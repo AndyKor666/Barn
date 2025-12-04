@@ -1,11 +1,14 @@
+import os
+SAVE_FILE = "save.txt"
+
 class Plant:
     def __init__(self, pid, name, base_grow_time, sell_price, stage_count, image_prefix):
-        self.id = pid
-        self.name = name
-        self.base_grow_time = base_grow_time
-        self.sell_price = sell_price
-        self.stage_count = stage_count
-        self.image_prefix = image_prefix
+        self.id=pid
+        self.name=name
+        self.base_grow_time=base_grow_time
+        self.sell_price=sell_price
+        self.stage_count=stage_count
+        self.image_prefix=image_prefix
 class Fertilizer:
     def __init__(self, fid, name, price, multiplier):
         self.id = fid
@@ -49,6 +52,23 @@ class GameModel:
             if f.id == fid:
                 return f
         return None
+
+    def save_game(self):
+        lines=[]
+        lines.append(f"balance={self.balance}")
+        barn_str=",".join([f"{name}:{count}" for name, count in self.barn.items()])
+        lines.append(f"barn={barn_str}")
+        fert_str=",".join([f"{fid}:{count}" for fid, count in self.fertilizer_inventory.items()])
+        lines.append(f"fertilizers={fert_str}")
+        for i, p in enumerate(self.plots):
+            if p.state == "empty":
+                lines.append(f"plot{i}=empty")
+            elif p.state == "growing":
+                lines.append(f"plot{i}=growing, plant={p.plant.id}, remaining={p.remaining_time}")
+            elif p.state == "ready":
+                lines.append(f"plot{i}=ready, plant={p.plant.id}")
+        with open(SAVE_FILE, "w") as f:
+            f.write("\n".join(lines))
 
     def buy_fertilizer(self, fid):
         fert = self.get_fertilizer_by_id(fid)
