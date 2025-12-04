@@ -1,6 +1,6 @@
-balance is 76$
-barn has 
-fertilizers -> 
-plot0 -> growing, plant -> 3, remaining -> 3
-plot1 -> empty
-plot2 -> empty
+Balance is 20$
+Barn has Corn:6,Carrot:3.
+Fertilizers -> 1:2,2:1
+Plot 1: empty
+Plot 2: empty
+Plot 3: empty

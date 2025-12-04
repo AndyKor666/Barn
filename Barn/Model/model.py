@@ -27,51 +27,47 @@ class FarmPlot:
 
 class GameModel:
     def __init__(self):
-        self.plants = [
-            Plant(1, "Wheat",  base_grow_time=8, sell_price=12,
-                  stage_count=4, image_prefix="wheat"),
-            Plant(2, "Carrot", base_grow_time=6, sell_price=8,
-                  stage_count=4, image_prefix="carrot"),
-            Plant(3, "Corn",   base_grow_time=12, sell_price=20,
-                  stage_count=4, image_prefix="corn"),
-        ]
-        self.fertilizers = [
-            Fertilizer(1, "Basic Fertilizer",  price=10, multiplier=0.8),
-            Fertilizer(2, "Super Fertilizer",  price=20, multiplier=0.5),
-        ]
         self.balance = 50
-        self.fertilizer_inventory = {f.id: 0 for f in self.fertilizers}
+
+        self.plants = [
+            Plant(1, "Corn", 12, 20, 4, "corn"),
+            Plant(2, "Carrot", 6, 8, 4, "carrot"),
+            Plant(3, "Wheat", 8, 12, 4, "wheat"),
+        ]
+
+        self.fertilizers = [
+            Fertilizer(1, "Basic Fertilizer",  10, 0.8),
+            Fertilizer(2, "Super Fertilizer",  20, 0.5),
+        ]
+
+        self.fertilizer_inventory = {}
+        for f in self.fertilizers:
+            self.fertilizer_inventory[f.id] = 0
+
         self.barn = {}
         self.plots = [FarmPlot(i) for i in range(1, 4)]
 
-    def get_plant_by_id(self, pid):
-        for p in self.plants:
-            if p.id == pid:
-                return p
-        return None
-
-    def get_fertilizer_by_id(self, fid):
-        for f in self.fertilizers:
-            if f.id == fid:
-                return f
-        return None
 
 #----------------------------------------------------------------------------
 
     def save_game(self):
         lines=[]
-        lines.append(f"balance is {self.balance}$")
+        lines.append(f"Balance is {self.balance}$")
         barn_str=",".join([f"{name}:{count}" for name, count in self.barn.items()])
-        lines.append(f"barn has {barn_str}")
+        if self.barn:
+            barn_str=",".join(f"{name}:{count}" for name, count in self.barn.items())
+            lines.append(f"Barn has {barn_str}.")
+        else:
+            lines.append("Barn is empty.")
         fert_str=",".join([f"{fid}:{count}" for fid, count in self.fertilizer_inventory.items()])
-        lines.append(f"fertilizers={fert_str}")
+        lines.append(f"Fertilizers -> {fert_str}")
         for i, p in enumerate(self.plots):
             if p.state == "empty":
-                lines.append(f"plot{i} -> empty")
+                lines.append(f"Plot {i+1}: empty")
             elif p.state == "growing":
-                lines.append(f"plot{i} -> growing, plant -> {p.plant.id}, remaining -> {p.remaining_time}")
+                lines.append(f"Plot {i+1}: growing, plant: {p.plant.id}, remaining: {p.remaining_time}")
             elif p.state == "ready":
-                lines.append(f"plot{i} -> ready, plant -> {p.plant.id}")
+                lines.append(f"Plot {i+1}: ready, plant: {p.plant.id}")
         with open(SAVE_FILE, "w") as f:
             f.write("\n".join(lines))
 
@@ -131,6 +127,18 @@ class GameModel:
 
 #----------------------------------------------------------------------------
 
+    def get_plant_by_id(self, pid):
+        for p in self.plants:
+            if p.id == pid:
+                return p
+        return None
+
+    def get_fertilizer_by_id(self, fid):
+        for f in self.fertilizers:
+            if f.id == fid:
+                return f
+        return None
+
     def buy_fertilizer(self, fid):
         fert = self.get_fertilizer_by_id(fid)
         if fert is None:
@@ -140,7 +148,9 @@ class GameModel:
             return False, "Not enough money"
 
         self.balance -= fert.price
+        self.fertilizer_inventory.setdefault(fid, 0)
         self.fertilizer_inventory[fid] += 1
+
         return True, f"Bought {fert.name}"
 
     def plant_crop(self, plot_index, plant_id, fertilizer_id=None):

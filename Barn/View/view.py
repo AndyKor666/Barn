@@ -140,7 +140,7 @@ class GameView:
             self.plant_combo.current(0)
 
     def set_fert_options(self, names):
-        self.fert_combo["values"] = ["(none)"] + names
+        self.fert_combo["values"] = ["None"] + names
         if names:
             self.fert_combo.current(0)
         else:
