@@ -112,27 +112,48 @@ class GameView:
         )
         self.open_barn_button.pack(side="left", padx=10)
 
-    def _load_image(self, filename, size=(96, 96)):
-        path = os.path.join(ASSETS_DIR, filename)
-        if not os.path.exists(path):
+    def _load_image(self, img_path, size=(96, 96)):
+        print("\n--- IMAGE DEBUG ---")
+        print("PATH GIVEN:", img_path)
+
+        if not img_path:
+            print("PATH IS NONE")
             return None
-        img = Image.open(path).resize(size)
-        return ImageTk.PhotoImage(img)
+
+        if not os.path.exists(img_path):
+            print("FILE DOES NOT EXIST")
+            return None
+        try:
+            img = Image.open(img_path)
+            print("FILE OPENED:", img.size)
+
+            img = img.resize(size)
+            photo = ImageTk.PhotoImage(img)
+
+            print("IMAGE CONVERTED FOR TK")
+            return photo
+
+        except Exception as ValueError:
+            print("PIL ERROR:", ValueError)
+            return None
 
     def set_balance(self, balance):
         self.balance_label.config(text=f"Balance: ${balance}")
+
     def set_message(self, msg):
         self.message_label.config(text=msg)
+
     def set_barn_summary(self, text):
         self.barn_summary_label.config(text=f"Barn: {text}")
-    def update_plot(self, index, state_text, img_name=None):
+
+    def update_plot(self, index, state_text, img_path=None):
         self.plot_status_labels[index].config(text=state_text)
-        if img_name:
-            pic = self._load_image(img_name)
-        else:
-            pic = self._load_image("empty.png")
+        pic = self._load_image(img_path)
         self._plot_images[index] = pic
-        self.plot_image_labels[index].config(image=pic)
+        if pic:
+            self.plot_image_labels[index].config(image=pic)
+        else:
+            self.plot_image_labels[index].config(image="")
 
     def set_plant_options(self, names):
         self.plant_combo["values"] = names

@@ -1,6 +1,10 @@
+import importlib
+import Services.Resource_service
+importlib.reload(Services.Resource_service)
+
+from Services.Resource_service import ResourceService
 from Models.model import GameModel
 from View.view import GameView, ShopWindow, BarnWindow
-
 from Controllers.plot_controller import PlotController
 from Controllers.shop_controller import ShopController
 from Controllers.barn_controller import BarnController
@@ -14,8 +18,7 @@ class GameController:
 
         self.shop_window = None
         self.barn_window = None
-
-        self.model.load_game()
+        ResourceService.load_game(self.model)
 
         self.plot_controller = PlotController(
             self.model, self.view, self.set_message, self.refresh_all
@@ -60,7 +63,7 @@ class GameController:
 
             if plot.state == "empty":
                 text = "Empty"
-                img_name = "empty.png"
+                img_path = ResourceService.get_item("empty")
                 self.view.plot_buttons[i].config(text="Plant", state="normal")
 
             elif plot.state == "growing":
@@ -73,21 +76,26 @@ class GameController:
                 total = plant.base_grow_time
                 stages = plant.stages
                 elapsed = total - remaining
+
                 stage = max(1, min(stages, int(elapsed / (total / stages)) + 1))
 
-                img_name = f"{plant.asset_prefix}_{stage}.png"
+                key = f"{plant.image_prefix}_{stage}"
+                img_path = ResourceService.get_item(key)
 
             elif plot.state == "ready":
                 plant = plot.plant
                 text = f"Ready: {plant.name}"
-                img_name = f"{plant.asset_prefix}_{plant.stages}.png"
+
+                key = f"{plant.image_prefix}_{plant.stages}"
+                img_path = ResourceService.get_item(key)
+
                 self.view.plot_buttons[i].config(text="Harvest", state="normal")
 
             else:
                 text = "Unknown"
-                img_name = "empty.png"
+                img_path = ResourceService.get_item("empty")
 
-            self.view.update_plot(i, text, img_name)
+            self.view.update_plot(i, text, img_path)
 
     def refresh_fertilizer_inventory(self):
         lines = []

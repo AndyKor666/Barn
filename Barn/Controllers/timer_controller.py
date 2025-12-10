@@ -1,3 +1,5 @@
+from Services.Resource_service import ResourceService
+
 class TimerController:
     def __init__(self, model, view, refresh_plots, set_message):
         self.model = model
@@ -6,14 +8,16 @@ class TimerController:
         self.set_message = set_message
 
     def autosave(self):
-        self.model.save_game()
+        ResourceService.save_game(self.model)
         self.view.root.after(3000, self.autosave)
 
     def schedule_tick(self):
         just_ready = self.model.tick()
 
         if just_ready:
-            names = ", ".join(f"{pl.plant.name} on plot {pl.id}" for pl in just_ready)
+            names = ", ".join(
+                plot.plant.name for plot in just_ready if plot.plant
+            )
             self.set_message(f"Ready to harvest: {names}")
 
         self.refresh_plots()

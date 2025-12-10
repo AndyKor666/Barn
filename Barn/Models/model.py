@@ -7,12 +7,12 @@ from Models.corn import Corn
 SAVE_FILE = "save.json"
 
 class Plant:
-    def __init__(self, pid, name, base_grow_time, sell_price, stage_count, image_prefix):
+    def __init__(self, pid, name, base_grow_time, sell_price, stages, image_prefix):
         self.id = pid
         self.name = name
         self.base_grow_time = base_grow_time
         self.sell_price = sell_price
-        self.stage_count = stage_count
+        self.stages = stages
         self.image_prefix = image_prefix
 
 class Fertilizer:
@@ -43,81 +43,6 @@ class GameModel:
 
         self.barn = {}
         self.plots = [FarmPlot(i) for i in range(1, 4)]
-
-#----------------------------------------------------------------------------
-
-    def save_game(self):
-        data = {
-            "balance": self.balance,
-            "barn": self.barn,
-            "fertilizers": self.fertilizer_inventory,
-            "plots": []
-        }
-
-        for plot in self.plots:
-            if plot.state == "empty":
-                data["plots"].append({
-                    "state": "empty"
-                })
-            elif plot.state == "growing":
-                data["plots"].append({
-                    "state": "growing",
-                    "plant_id": plot.plant.id,
-                    "remaining_time": plot.remaining_time,
-                    "total_time": plot.total_time
-                })
-            elif plot.state == "ready":
-                data["plots"].append({
-                    "state": "ready",
-                    "plant_id": plot.plant.id
-                })
-
-        with open(SAVE_FILE, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=4)
-
-
-    def load_game(self):
-        if not os.path.exists(SAVE_FILE):
-            return
-        try:
-            with open(SAVE_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except:
-            return
-        self.balance = data.get("balance", 50)
-        self.barn = data.get("barn", {})
-
-        self.fertilizer_inventory = data.get("fertilizers", {})
-        self.fertilizer_inventory = {
-            int(k): v for k, v in self.fertilizer_inventory.items()
-        }
-        plots_data = data.get("plots", [])
-
-        for i, plot_data in enumerate(plots_data):
-            plot = self.plots[i]
-            state = plot_data.get("state")
-
-            if state == "empty":
-                plot.state = "empty"
-                plot.plant = None
-                plot.remaining_time = 0
-                plot.total_time = 0
-
-            elif state == "growing":
-                plant_id = plot_data.get("plant_id")
-                plot.state = "growing"
-                plot.plant = self.get_plant_by_id(plant_id)
-                plot.remaining_time = plot_data.get("remaining_time", 0)
-                plot.total_time = plot_data.get("total_time", 0)
-
-            elif state == "ready":
-                plant_id = plot_data.get("plant_id")
-                plot.state = "ready"
-                plot.plant = self.get_plant_by_id(plant_id)
-                plot.remaining_time = 0
-                plot.total_time = 0
-
-#----------------------------------------------------------------------------
 
     def get_plant_by_id(self, pid):
         for p in self.plants:
