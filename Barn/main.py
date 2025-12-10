@@ -1,5 +1,5 @@
 import tkinter as tk
-from Controller.controller import GameController
+from Controllers.game_controller import GameController
 
 def main():
     root = tk.Tk()

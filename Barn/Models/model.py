@@ -1,18 +1,19 @@
 import os
+import json
 from Models.wheat import Wheat
 from Models.carrot import Carrot
 from Models.corn import Corn
 
-SAVE_FILE = "save.txt"
+SAVE_FILE = "save.json"
 
 class Plant:
     def __init__(self, pid, name, base_grow_time, sell_price, stage_count, image_prefix):
-        self.id=pid
-        self.name=name
-        self.base_grow_time=base_grow_time
-        self.sell_price=sell_price
-        self.stage_count=stage_count
-        self.image_prefix=image_prefix
+        self.id = pid
+        self.name = name
+        self.base_grow_time = base_grow_time
+        self.sell_price = sell_price
+        self.stage_count = stage_count
+        self.image_prefix = image_prefix
 
 class Fertilizer:
     def __init__(self, fid, name, price, multiplier):
@@ -46,75 +47,75 @@ class GameModel:
 #----------------------------------------------------------------------------
 
     def save_game(self):
-        lines=[]
-        lines.append(f"balance={self.balance}")
-        barn_str=",".join([f"{name}:{count}" for name, count in self.barn.items()])
-        lines.append(f"barn={barn_str}")
-        fert_str=",".join([f"{fid}:{count}" for fid, count in self.fertilizer_inventory.items()])
-        lines.append(f"fertilizers={fert_str}")
-        for i, p in enumerate(self.plots):
-            if p.state == "empty":
-                lines.append(f"plot{i}->empty")
-            elif p.state == "growing":
-                lines.append(f"plot{i}->growing, plant->{p.plant.id}, remaining->{p.remaining_time}")
-            elif p.state == "ready":
-                lines.append(f"plot{i}->ready, plant->{p.plant.id}")
-        with open(SAVE_FILE, "w") as f:
-            f.write("\n".join(lines))
+        data = {
+            "balance": self.balance,
+            "barn": self.barn,
+            "fertilizers": self.fertilizer_inventory,
+            "plots": []
+        }
+
+        for plot in self.plots:
+            if plot.state == "empty":
+                data["plots"].append({
+                    "state": "empty"
+                })
+            elif plot.state == "growing":
+                data["plots"].append({
+                    "state": "growing",
+                    "plant_id": plot.plant.id,
+                    "remaining_time": plot.remaining_time,
+                    "total_time": plot.total_time
+                })
+            elif plot.state == "ready":
+                data["plots"].append({
+                    "state": "ready",
+                    "plant_id": plot.plant.id
+                })
+
+        with open(SAVE_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
+
 
     def load_game(self):
         if not os.path.exists(SAVE_FILE):
             return
         try:
-            with open(SAVE_FILE, "r") as f:
-                lines = f.read().splitlines()
+            with open(SAVE_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
         except:
             return
+        self.balance = data.get("balance", 50)
+        self.barn = data.get("barn", {})
 
-        data={}
-        for line in lines:
-            if "=" in line:
-                key, value = line.split("=", 1)
-                data[key] = value
-        self.balance = int(data.get("balance", 0))
-        barn_raw = data.get("barn", "")
-        self.barn = {}
-        if barn_raw:
-            for item in barn_raw.split(","):
-                if ":" in item:
-                    name, count = item.split(":")
-                    self.barn[name] = int(count)
-        fert_raw = data.get("fertilizers", "")
-        self.fertilizer_inventory = {}
-        if fert_raw:
-            for item in fert_raw.split(","):
-                if ":" in item:
-                    fid, count = item.split(":")
-                    self.fertilizer_inventory[int(fid)] = int(count)
-        for i in range(len(self.plots)):
-            key=f"plot{i}"
-            if key not in data:
-                continue
-            val=data[key]
-            if val == "empty":
-                self.plots[i].state = "empty"
-                self.plots[i].plant = None
-                self.plots[i].remaining_time = 0
-            else:
-                parts = val.split(",")
-                state = parts[0]
-                self.plots[i].state = state
-                plant_id = None
-                remaining = 0
-                for p in parts[1:]:
-                    if p.startswith("plant="):
-                        plant_id = int(p.split("=")[1])
-                    elif p.startswith("remaining="):
-                        remaining = int(p.split("=")[1])
-                if plant_id is not None:
-                    plant = next(pl for pl in self.plants if pl.id == plant_id)
-                    self.plots[i].plant = plant
-                self.plots[i].remaining_time = remaining
+        self.fertilizer_inventory = data.get("fertilizers", {})
+        self.fertilizer_inventory = {
+            int(k): v for k, v in self.fertilizer_inventory.items()
+        }
+        plots_data = data.get("plots", [])
+
+        for i, plot_data in enumerate(plots_data):
+            plot = self.plots[i]
+            state = plot_data.get("state")
+
+            if state == "empty":
+                plot.state = "empty"
+                plot.plant = None
+                plot.remaining_time = 0
+                plot.total_time = 0
+
+            elif state == "growing":
+                plant_id = plot_data.get("plant_id")
+                plot.state = "growing"
+                plot.plant = self.get_plant_by_id(plant_id)
+                plot.remaining_time = plot_data.get("remaining_time", 0)
+                plot.total_time = plot_data.get("total_time", 0)
+
+            elif state == "ready":
+                plant_id = plot_data.get("plant_id")
+                plot.state = "ready"
+                plot.plant = self.get_plant_by_id(plant_id)
+                plot.remaining_time = 0
+                plot.total_time = 0
 
 #----------------------------------------------------------------------------
 

@@ -1,0 +1,30 @@
+{
+    "balance": 238,
+    "barn": {
+        "Corn": 3
+    },
+    "fertilizers": {
+        "1": 4,
+        "2": 3
+    },
+    "plots": [
+        {
+            "state": "growing",
+            "plant_id": 1,
+            "remaining_time": 9,
+            "total_time": 12
+        },
+        {
+            "state": "growing",
+            "plant_id": 1,
+            "remaining_time": 9,
+            "total_time": 12
+        },
+        {
+            "state": "growing",
+            "plant_id": 1,
+            "remaining_time": 11,
+            "total_time": 12
+        }
+    ]
+}
