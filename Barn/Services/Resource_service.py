@@ -2,9 +2,10 @@ import os
 import json
 
 class ResourceService:
-    SAVE_FILE = "save.json"
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+    SAVE_FILE = os.path.join(BASE_DIR, "save.json")
+
     _resources = {
         "empty": os.path.join(ASSETS_DIR, "empty.png"),
 
@@ -23,26 +24,23 @@ class ResourceService:
         "wheat_3": os.path.join(ASSETS_DIR, "wheat_3.png"),
         "wheat_4": os.path.join(ASSETS_DIR, "wheat_4.png"),
     }
-
     @staticmethod
     def get_item(key: str) -> str:
-        print("LOADING:", key)
         if key in ResourceService._resources:
             path = ResourceService._resources[key]
-            print("PATH:", path)
             if os.path.exists(path):
                 return path
 
         if "_" in key:
             prefix = key.split("_")[0]
-
             candidates = [
                 k for k in ResourceService._resources
                 if k.startswith(prefix + "_")
             ]
             if candidates:
                 return ResourceService._resources[candidates[-1]]
-        return None
+
+        return ResourceService._resources.get("empty")
 
     @staticmethod
     def save_game(model):
@@ -52,20 +50,26 @@ class ResourceService:
             "fertilizers": model.fertilizer_inventory,
             "plots": []
         }
+
         for plot in model.plots:
             if plot.state == "empty":
-                data["plots"].append({"state": "empty"})
+                data["plots"].append({
+                    "state": "empty",
+                    "fert_boost": plot.fert_boost
+                })
             elif plot.state == "growing":
                 data["plots"].append({
                     "state": "growing",
                     "plant_id": plot.plant.id,
                     "remaining_time": plot.remaining_time,
-                    "total_time": plot.total_time
+                    "total_time": plot.total_time,
+                    "fert_boost": plot.fert_boost
                 })
             elif plot.state == "ready":
                 data["plots"].append({
                     "state": "ready",
-                    "plant_id": plot.plant.id
+                    "plant_id": plot.plant.id,
+                    "fert_boost": plot.fert_boost
                 })
 
         with open(ResourceService.SAVE_FILE, "w", encoding="utf-8") as f:
@@ -75,10 +79,11 @@ class ResourceService:
     def load_game(model):
         if not os.path.exists(ResourceService.SAVE_FILE):
             return
+
         try:
             with open(ResourceService.SAVE_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
-        except:
+        except Exception:
             return
 
         model.balance = data.get("balance", 50)
@@ -87,28 +92,32 @@ class ResourceService:
         model.fertilizer_inventory = {
             int(k): v for k, v in data.get("fertilizers", {}).items()
         }
-        plots = data.get("plots", [])
+        plots_data = data.get("plots", [])
 
-        for i, plot_data in enumerate(plots):
-            plot = model.plots[i]
-            state = plot_data.get("state")
+        from Models.model import FarmPlot
 
-            if state == "empty":
-                plot.state = "empty"
-                plot.plant = None
-                plot.remaining_time = 0
-                plot.total_time = 0
+        model.plots = []
+        for i, plot_data in enumerate(plots_data):
+            if i >= model.MAX_PLOTS:
+                break
+            plot = FarmPlot(i + 1)
+            state = plot_data.get("state", "empty")
+            plot.state = state
+            plot.fert_boost = plot_data.get("fert_boost", 0)
 
-            elif state == "growing":
+            if state == "growing":
                 plant_id = plot_data.get("plant_id")
-                plot.state = "growing"
                 plot.plant = model.get_plant_by_id(plant_id)
                 plot.remaining_time = plot_data.get("remaining_time", 0)
                 plot.total_time = plot_data.get("total_time", 0)
 
             elif state == "ready":
                 plant_id = plot_data.get("plant_id")
-                plot.state = "ready"
                 plot.plant = model.get_plant_by_id(plant_id)
                 plot.remaining_time = 0
-                plot.total_time = 0
+                plot.total_time = plot_data.get("total_time", 0)
+
+            model.plots.append(plot)
+
+        while len(model.plots) < 3:
+            model.plots.append(FarmPlot(len(model.plots) + 1))

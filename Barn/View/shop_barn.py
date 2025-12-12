@@ -1,6 +1,5 @@
 from DTO.NewField import NewFieldDTO
 
-
 class ShopController:
     def __init__(self, model, set_message, refresh_all):
         self.model = model
@@ -14,19 +13,11 @@ class ShopController:
             self.refresh_all()
 
     def shop_sell_crop(self, plant_name, count):
-        if count <= 0:
-            return False, "Invalid count"
-
-        last_msg = None
-
         for _ in range(count):
             ok, msg = self.model.sell_from_barn(plant_name)
             if not ok:
                 return False, msg
-            last_msg = msg
-
-        return True, last_msg
-
+        return True, msg
 
     def buy_new_plot(self, with_fertilizer: bool):
         dto = NewFieldDTO(

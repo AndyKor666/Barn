@@ -9,15 +9,13 @@ class TimerController:
 
     def autosave(self):
         ResourceService.save_game(self.model)
-        self.view.root.after(3000, self.autosave)
+        self.view.root.after(30000, self.autosave)
 
     def schedule_tick(self):
         just_ready = self.model.tick()
 
         if just_ready:
-            names = ", ".join(
-                plot.plant.name for plot in just_ready if plot.plant
-            )
+            names = ", ".join(set(p.plant.name for p in just_ready if p.plant))
             self.set_message(f"Ready to harvest: {names}")
 
         self.refresh_plots()

@@ -1,19 +1,81 @@
 {
-    "balance": 1343,
-    "barn": {},
+    "balance": 7999999999979038,
+    "barn": {
+        "Corn": 0,
+        "Wheat": 0,
+        "Carrot": 0
+    },
     "fertilizers": {
-        "1": 6,
-        "2": 7
+        "1": 17,
+        "2": 24
     },
     "plots": [
         {
-            "state": "empty"
+            "state": "growing",
+            "plant_id": 1,
+            "remaining_time": 11,
+            "total_time": 12,
+            "fert_boost": 0
         },
         {
-            "state": "empty"
+            "state": "empty",
+            "fert_boost": 0
         },
         {
-            "state": "empty"
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
+        {
+            "state": "empty",
+            "fert_boost": 0
         }
     ]
 }

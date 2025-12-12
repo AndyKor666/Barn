@@ -8,5 +8,5 @@ class Corn(Plant):
             base_grow_time=12,
             sell_price=20,
             stages=4,
-            image_prefix="corn"
+            image_prefix="corn",
         )
