@@ -1,20 +1,17 @@
 {
-    "balance": 7999999999979038,
+    "balance": 7999999999975868,
     "barn": {
         "Corn": 0,
         "Wheat": 0,
         "Carrot": 0
     },
     "fertilizers": {
-        "1": 17,
-        "2": 24
+        "1": 115,
+        "2": 148
     },
     "plots": [
         {
-            "state": "growing",
-            "plant_id": 1,
-            "remaining_time": 11,
-            "total_time": 12,
+            "state": "empty",
             "fert_boost": 0
         },
         {
