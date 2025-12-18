@@ -21,12 +21,6 @@ class GameView:
         )
         self.balance_label.pack(side="left", padx=20)
 
-        self.barn_summary_label = tk.Label(
-            top_frame, text="Barn: (empty)", font=("Consolas", 11),
-            bg="#f4f4f4", fg="#555"
-        )
-        self.barn_summary_label.pack(side="left", padx=20)
-
         self.message_label = tk.Label(
             top_frame, text="", font=("Consolas", 12, "italic"),
             bg="#f4f4f4", fg="#555555"
@@ -157,9 +151,6 @@ class GameView:
 
     def set_message(self, msg):
         self.message_label.config(text=msg)
-
-    def set_barn_summary(self, text):
-        self.barn_summary_label.config(text=f"Barn: {text}")
 
     def update_plot(self, index, state_text, img_path=None,
                     button_text=None, button_state="normal"):

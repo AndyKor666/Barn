@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Controllers\barn_controller.py" />
+    <Compile Include="Controllers\mission_controller.py" />
     <Compile Include="Controllers\plot_controller.py" />
     <Compile Include="Controllers\shop_controller.py" />
     <Compile Include="Controllers\timer_controller.py" />
@@ -30,6 +31,7 @@
     <Compile Include="Controllers\game_controller.py" />
     <Compile Include="Models\carrot.py" />
     <Compile Include="Models\corn.py" />
+    <Compile Include="Models\mission_model.py" />
     <Compile Include="Models\model.py" />
     <Compile Include="Models\plant.py" />
     <Compile Include="Models\wheat.py" />
