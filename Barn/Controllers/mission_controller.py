@@ -8,22 +8,11 @@ class MissionController:
         self.refresh_all = refresh_all
         self.logger = LoggerService.get_logger()
 
-        self.logger.info("[SYSTEM] MissionController initialized")
-
     def check_missions(self):
         completed = self.mission_model.check(self.model)
-
-        for mission in completed:
-            self.model.balance += mission.reward
-
-            self.logger.info(
-                f"[ACHIEVEMENT] Mission completed: "
-                f"{mission.title} (+${mission.reward})"
-            )
-
-            self.set_message(
-                f"Mission completed: {mission.title} (+${mission.reward})"
-            )
-
+        for m in completed:
+            self.model.balance += m.reward
+            self.set_message(f"Mission completed: {m.title} (+{m.reward})")
+            self.logger.info(f"[MISSION] Completed: {m.title}")
         if completed:
             self.refresh_all()

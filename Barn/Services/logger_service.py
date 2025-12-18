@@ -1,10 +1,8 @@
 import logging
 import os
 
-
 class LoggerService:
     _logger = None
-
     @staticmethod
     def get_logger():
         if LoggerService._logger:
@@ -25,12 +23,9 @@ class LoggerService:
                 "%(asctime)s | %(levelname)s | %(message)s",
                 datefmt="%Y-%m-%d %H:%M:%S"
             )
-
             file_handler = logging.FileHandler(log_path, encoding="utf-8")
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
-
             logger.info("======== INFO SAVED ========")
-
         LoggerService._logger = logger
         return logger

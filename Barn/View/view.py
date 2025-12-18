@@ -268,7 +268,7 @@ class ShopWindow(tk.Toplevel):
     def _on_sell(self):
         selection = self.barn_listbox.curselection()
         if not selection:
-            self.controller.set_message("Select a crop to sell.")
+            self.controller.set_message("Select a crop to sell . . .")
             return
 
         line = self.barn_listbox.get(selection[0])

@@ -1,6 +1,0 @@
-balance=328
-barn=
-fertilizers=1:991,2:11
-plot0->growing, plant->1, remaining->6
-plot1->growing, plant->1, remaining->6
-plot2->growing, plant->1, remaining->9

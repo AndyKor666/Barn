@@ -31,6 +31,7 @@
     <Compile Include="Controllers\game_controller.py" />
     <Compile Include="Models\carrot.py" />
     <Compile Include="Models\corn.py" />
+    <Compile Include="Missions\mission.py" />
     <Compile Include="Models\mission_model.py" />
     <Compile Include="Models\model.py" />
     <Compile Include="Models\plant.py" />
@@ -44,6 +45,7 @@
     <Folder Include="Models\" />
     <Folder Include="Controllers\" />
     <Folder Include="DTO\" />
+    <Folder Include="Missions\" />
     <Folder Include="Services\" />
     <Folder Include="View\" />
   </ItemGroup>
