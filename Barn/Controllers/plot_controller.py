@@ -1,4 +1,5 @@
-from Services.logger_service import LoggerService
+from Services.Logger_service import LoggerService
+from Controllers.mission_controller import MissionController
 
 class PlotController:
     def __init__(self, model, view, set_message, refresh_all, mission_controller):

@@ -6,7 +6,7 @@ from Controllers.shop_controller import ShopController
 from Controllers.barn_controller import BarnController
 from Controllers.timer_controller import TimerController
 from Controllers.mission_controller import MissionController
-from Services.logger_service import LoggerService
+from Services.Logger_service import LoggerService
 from Missions.mission import Mission
 
 

@@ -7,7 +7,6 @@ class LoggerService:
     def get_logger():
         if LoggerService._logger:
             return LoggerService._logger
-
         documents_path = os.path.join(os.path.expanduser("~"), "Documents")
         barn_dir = os.path.join(documents_path, "Barn")
         os.makedirs(barn_dir, exist_ok=True)
