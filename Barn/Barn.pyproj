@@ -36,8 +36,20 @@
     <Compile Include="Models\model.py" />
     <Compile Include="Models\plant.py" />
     <Compile Include="Models\wheat.py" />
-    <Compile Include="Services\Logger_service.py" />
-    <Compile Include="Services\Resource_service.py" />
+    <Compile Include="Services\logger_service.py" />
+    <Compile Include="Services\resource_service.py" />
+    <Compile Include="Tests\test_game_model_buy_plots.py" />
+    <Compile Include="Tests\test_game_model_core.py" />
+    <Compile Include="Tests\test_game_model_fertilizer.py" />
+    <Compile Include="Tests\test_game_model_planting_harvest.py" />
+    <Compile Include="Tests\test_game_model_sell_shop.py" />
+    <Compile Include="Tests\test_game_model_stages.py" />
+    <Compile Include="Tests\test_mision_controller.py" />
+    <Compile Include="Tests\test_missions.py" />
+    <Compile Include="Tests\test_mission_model.py" />
+    <Compile Include="Tests\test_model.py" />
+    <Compile Include="Tests\test_model_plots.py" />
+    <Compile Include="Tests\__init__.py" />
     <Compile Include="View\shop_barn.py" />
     <Compile Include="View\view.py" />
   </ItemGroup>
@@ -46,6 +58,7 @@
     <Folder Include="Controllers\" />
     <Folder Include="DTO\" />
     <Folder Include="Missions\" />
+    <Folder Include="Tests\" />
     <Folder Include="Services\" />
     <Folder Include="View\" />
   </ItemGroup>

@@ -1,15 +1,19 @@
 {
-    "balance": 0,
+    "balance": 640,
     "barn": {
-        "Corn": 2,
+        "Corn": 0,
         "Carrot": 0,
         "Wheat": 0
     },
     "fertilizers": {
-        "1": 29,
-        "2": 41
+        "1": 33,
+        "2": 39
     },
     "plots": [
+        {
+            "state": "empty",
+            "fert_boost": 0
+        },
         {
             "state": "empty",
             "fert_boost": 0

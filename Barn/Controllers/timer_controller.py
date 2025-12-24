@@ -1,4 +1,4 @@
-from Services.Resource_service import ResourceService
+from Services.resource_service import ResourceService
 
 class TimerController:
     def __init__(self, model, view, refresh_plots, set_message):

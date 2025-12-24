@@ -1,4 +1,4 @@
-from Services.Logger_service import LoggerService
+from Services.logger_service import LoggerService
 
 class BarnController:
     def __init__(self, model, view):

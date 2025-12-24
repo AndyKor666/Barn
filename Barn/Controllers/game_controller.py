@@ -1,4 +1,4 @@
-from Services.Resource_service import ResourceService
+from Services.resource_service import ResourceService
 from Models.model import GameModel
 from View.view import GameView, ShopWindow, BarnWindow
 from Controllers.plot_controller import PlotController
@@ -6,7 +6,7 @@ from Controllers.shop_controller import ShopController
 from Controllers.barn_controller import BarnController
 from Controllers.timer_controller import TimerController
 from Controllers.mission_controller import MissionController
-from Services.Logger_service import LoggerService
+from Services.logger_service import LoggerService
 from Missions.mission import Mission
 
 
